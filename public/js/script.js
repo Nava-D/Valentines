@@ -1,3 +1,65 @@
+/* =========================================================
+   FIX BROKEN GIFS ON LOAD (GitHub Pages is case-sensitive)
+   This force-loads the correct-cased GIF filenames even if
+   index.html points to lowercase versions.
+   ========================================================= */
+const FIXED_GIFS = {
+    banner: "public/images/RedPandaFlowers.gif",
+    corner: "public/images/SnoopySmacked.gif",
+};
+
+function preloadImages(urls) {
+    urls.forEach((url) => {
+        const img = new Image();
+        img.src = url;
+    });
+}
+
+function fixStartGifs() {
+    // Fix banner gif
+    const banner = document.getElementById("banner");
+    if (banner) {
+        // If src is missing OR contains the lowercase wrong name, force correct
+        const srcAttr = (banner.getAttribute("src") || "").toLowerCase();
+        if (!srcAttr || srcAttr.includes("redpandaflowers")) {
+            banner.setAttribute("src", FIXED_GIFS.banner);
+        }
+        // If it fails to load, try the correct one again
+        banner.onerror = () => {
+            banner.onerror = null;
+            banner.src = FIXED_GIFS.banner;
+        };
+    }
+
+    // Fix corner gifs
+    const corners = document.querySelectorAll(".corner-gif");
+    corners.forEach((img) => {
+        const srcAttr = (img.getAttribute("src") || "").toLowerCase();
+        if (!srcAttr || srcAttr.includes("snoopysmacked")) {
+            img.setAttribute("src", FIXED_GIFS.corner);
+        }
+        img.onerror = () => {
+            img.onerror = null;
+            img.src = FIXED_GIFS.corner;
+        };
+    });
+}
+
+// Run as early as possible (your script is at the bottom, but this is safe either way)
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+        preloadImages([FIXED_GIFS.banner, FIXED_GIFS.corner]);
+        fixStartGifs();
+    });
+} else {
+    preloadImages([FIXED_GIFS.banner, FIXED_GIFS.corner]);
+    fixStartGifs();
+}
+
+/* =========================================================
+   YOUR ORIGINAL CODE
+   ========================================================= */
+
 const answers_no = {
     english: [
         "No",
